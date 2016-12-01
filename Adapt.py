@@ -400,3 +400,11 @@ class Metapopulation:
                     basicquality=table[x,y]
                     self.environment[x,y]=basicquality
                     self.visual.color_square(self.environment[x,y]*100, x, y)
+                    
+                    '''testtest
+        test
+        test
+        test
+        test
+        test
+        '''
