@@ -842,5 +842,5 @@ end = 5
 step = 0.25
 
 
-LH_varT(iters, start, end, step)
+LH_dispersal(iters, start, end, step)
 #LHcombinedplot(np.arange(start, end+step, step), 'dispersal', step/2)
