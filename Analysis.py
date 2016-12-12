@@ -19,6 +19,9 @@ default_path = "C:/Users/frederik/Documents/Doctoraat Gent/Model"
 
 
 def LHplot(pos, atype, directed, widths):
+    '''
+    plot life-history (LH) data of one run
+    '''
        
     alpha    = np.load(default_path + '/data/'+ atype + str(directed)+'/alpha.npy')
     gamma    = np.load(default_path + '/data/'+ atype + str(directed)+'/gamma.npy')
@@ -28,132 +31,43 @@ def LHplot(pos, atype, directed, widths):
     popsizes = np.load(default_path + '/data/'+ atype + str(directed)+'/popsizes.npy')
     dispprop = np.load(default_path + '/data/'+ atype + str(directed)+'/dispprop.npy')
     
-    bp0 = plt.boxplot(alpha, positions = pos, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp0['medians'], color='red')
-    plt.title('local population variability')
-    plt.xlabel(atype) 
-    axes = plt.gca() 
-    axes.set_xlim([0,end + step])
-    plt.ylabel('alpha variability')
-    plt.savefig( default_path + "/plots/LH_"+ atype + str(directed) + "/_Alpha Variability")
-    plt.clf()
+    def plot(y, title, ylab=''):
+        bp0 = plt.boxplot(y, positions = pos, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
+        plt.setp(bp0['boxes'], color='red', alpha = 0.3)
+        plt.setp(bp0['whiskers'], color='red')
+        plt.setp(bp0['fliers'], color='red')
+        plt.setp(bp0['medians'], color='red')
+        plt.title(title)
+        plt.xlabel(atype) 
+        axes = plt.gca() 
+        axes.set_xlim([0,end + step])
+        plt.ylabel(ylab)
+        plt.savefig( default_path + "/plots/LH_"+ atype + str(directed) + "/{}".format(title))
+        plt.clf()
     
-    
-    bp0 = plt.boxplot(gamma, positions = pos, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp0['medians'], color='red')
-    plt.title('metapopulation variability') 
-    plt.xlabel(atype) 
-    axes = plt.gca() 
-    axes.set_xlim([0,end + step])
-    plt.ylabel('gamma variability')
-    plt.savefig(default_path + "/plots/LH_"+ atype + str(directed) + "/_Gamma Variability")
-    plt.clf()
-    
-    bp0 = plt.boxplot(beta, positions = pos, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp0['medians'], color='red')
-    plt.title('metapopulation asynchrony') 
-    plt.xlabel(atype) 
-    axes = plt.gca() 
-    axes.set_xlim([0,end + step])
-    plt.ylabel('beta variability')
-    plt.savefig(default_path + "/plots/LH_"+ atype + str(directed) + "/_Metapop Asynchony")
-    plt.clf()
-    
-    
-    bp0 = plt.boxplot(div, positions = pos, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp0['medians'], color='red')
-    plt.title('muT') 
-    plt.xlabel(atype) 
-    axes = plt.gca() 
-    axes.set_xlim([0,end + step])
-    plt.savefig(default_path + "/plots/LH_"+ atype + str(directed) + "/Trait Value")
-    plt.clf()
-    
-    bp0 = plt.boxplot(HM, positions = pos, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp0['medians'], color='red')
-    plt.title('habitat mismatch')
-    plt.xlabel(atype) 
-    axes = plt.gca() 
-    axes.set_xlim([0,end + step])
-    plt.ylabel('habitat mismatch')
-    plt.savefig(default_path + "/plots/LH_"+ atype + str(directed) + "/Habitat Mismatch")
-    plt.clf()
-    
-    bp0 = plt.boxplot(popsizes, positions = pos, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp0['medians'], color='red')
-    plt.title('metapopulation size') 
-    plt.xlabel(atype) 
-    axes = plt.gca() 
-    axes.set_xlim([0,end + step])
-    plt.ylabel('population size') 
-    plt.savefig(default_path + "/plots/LH_"+ atype + str(directed) + "/Population Sizes")
-    plt.clf()
-    
-    
-    bp0 = plt.boxplot(dispprop, positions = pos, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp0['medians'], color='red')
-    plt.title('dispersal propensity')
-    plt.xlabel(atype) 
-    axes = plt.gca() 
-    axes.set_xlim([0,end + step])
-    plt.ylabel('dispersal propensity')
-    plt.savefig( default_path + "/plots/LH_"+ atype + str(directed) + "/Dispersal_propensity")
-    plt.clf()
-    
+    plot(alpha, 'local population variability', 'alpha variability')
+    plot(gamma, 'metapopulation variability', 'gamma variability')
+    plot(beta, 'metapopulation asynchrony', 'beta variability')
+    plot(div, 'muT')
+    plot(HM, 'habitat mismatch')
+    plot(popsizes, 'metapopulation size', 'individuals')
+    plot(dispprop, 'dispersal probability')
     
     if atype != "varT":
         NB = np.load(default_path + '/data/'+ atype + str(directed) + '/NB.npy')
-        bp0 = plt.boxplot(NB, positions = pos, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-        plt.setp(bp0['fliers'], color='red')
-        plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-        plt.setp(bp0['whiskers'], color='red')
-        plt.setp(bp0['medians'], color='red')
-        plt.title('niche width')
-        plt.xlabel(atype) 
-        axes = plt.gca() 
-        axes.set_xlim([0,end + step])
-        plt.ylabel('niche width')
-        plt.savefig(default_path + "/plots/LH_"+ atype + str(directed) + "/Niche Breadth")   
-        plt.clf()
+        plot(NB, 'niche width')
  
     if atype != "dispersal":
         TH = np.load(default_path + '/data/'+ atype + str(directed) + '/TH.npy')
-        bp0 = plt.boxplot(TH, positions = pos, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-        plt.setp(bp0['fliers'], color='red', alpha = 0.3)
-        plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-        plt.setp(bp0['whiskers'], color='red')
-        plt.setp(bp0['medians'], color='red')
-        plt.title('dispersal threshold')
-        plt.ylabel('dispersal threshold')
-        plt.xlabel(atype) 
-        axes = plt.gca() 
-        axes.set_xlim([0,end + step])
-        
-        plt.savefig(default_path + "/plots/LH_"+ atype + str(directed) + "/Threshold")   
-        plt.clf() 
+        plot(TH, 'dispersal threshold')
+
+
 
 def LHcombinedplot(pos, atype, widths):
+    '''
+    Plot the LH data of informed and random dispersal runs of the model together
+    '''
+    
     widths *= (2/3)
     alpha0    = np.load(default_path + '/data/'+ atype + '0/alpha.npy')
     gamma0    = np.load(default_path + '/data/'+ atype + '0/gamma.npy')
@@ -170,218 +84,52 @@ def LHcombinedplot(pos, atype, widths):
     popsizes1 = np.load(default_path + '/data/'+ atype + '1/popsizes.npy')
     dispprop1 = np.load(default_path + '/data/'+ atype + '1/dispprop.npy')
     
+    def combinedplot(y0, y1, title, ylab):
+        bp0 = plt.boxplot(y0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
+        bp1 = plt.boxplot(y1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
+        plt.setp(bp0['boxes'], color='red', alpha = 0.3)
+        plt.setp(bp1['boxes'], color='green', alpha = 0.3)
+        plt.setp(bp0['fliers'], color='red')
+        plt.setp(bp1['fliers'], color='green')
+        plt.setp(bp0['whiskers'], color='red')
+        plt.setp(bp1['whiskers'], color='green')
+        plt.setp(bp0['medians'], color='red')
+        plt.setp(bp1['medians'], color='green')
+        plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'))
+        plt.title(title)
+        plt.xlabel(atype)
+        if atype == "both":
+            plt.xticks(pos, ["random movement", "informed movement"])
+        else:
+            axes = plt.gca() 
+            axes.set_xlim([0,end + step])
+        plt.ylabel(ylab)
+        plt.savefig( default_path + "/combinedplots/LH_"+ atype + "/{}".format(title))
+        plt.clf()
     
-    bp0 = plt.boxplot(alpha0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    bp1 = plt.boxplot(alpha1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp1['boxes'], color='green', alpha = 0.3)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp1['fliers'], color='green')
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp1['whiskers'], color='green')
-    plt.setp(bp0['medians'], color='red')
-    plt.setp(bp1['medians'], color='green')
-    plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'))
-    plt.title('local population variability')
-    plt.xlabel(atype) 
-    if atype == "both":
-        plt.xticks(pos, ["random movement", "informed movement"])
-    else:
-        axes = plt.gca() 
-        axes.set_xlim([0,end + step])
-    plt.ylabel('alpha variability')
-    plt.savefig( default_path + "/combinedplots/LH_"+ atype + "/_Alpha Variability")
-    plt.clf()
-    
-    
-    bp0 = plt.boxplot(gamma0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    bp1 = plt.boxplot(gamma1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp1['boxes'], color='green', alpha = 0.3)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp1['fliers'], color='green')
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp1['whiskers'], color='green')
-    plt.setp(bp0['medians'], color='red')
-    plt.setp(bp1['medians'], color='green')
-    plt.title('metapopulation variability') 
-    plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'))
-    plt.xlabel(atype) 
-    if atype == "both":
-        plt.xticks(pos, ["random movement", "informed movement"])
-    else:
-        axes = plt.gca() 
-        axes.set_xlim([0,end + step])
-    plt.ylabel('gamma variability')
-    plt.savefig(default_path + "/combinedplots/LH_"+ atype + "/_Gamma Variability")
-    plt.clf()
-    
-    bp0 = plt.boxplot(beta0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    bp1 = plt.boxplot(beta1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp1['boxes'], color='green', alpha = 0.3)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp1['fliers'], color='green')
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp1['whiskers'], color='green')
-    plt.setp(bp0['medians'], color='red')
-    plt.setp(bp1['medians'], color='green')
-    plt.title('metapopulation asynchrony') 
-    plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'))
-    if atype == "both":
-        plt.xticks(pos, ["random movement", "informed movement"])
-    else:
-        plt.xlabel(atype) 
-        axes = plt.gca() 
-        axes.set_xlim([0,end + step])
-    plt.ylabel('beta variability')
-    plt.savefig(default_path + "/combinedplots/LH_"+ atype + "/_Metapop Asynchony")
-    plt.clf()
-    
-    
-    bp0 = plt.boxplot(div0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    bp1 = plt.boxplot(div1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp1['boxes'], color='green', alpha = 0.3)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp1['fliers'], color='green')
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp1['whiskers'], color='green')
-    plt.setp(bp0['medians'], color='red')
-    plt.setp(bp1['medians'], color='green')
-    plt.title('muT') 
-    plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'))
-    if atype == "both":
-        plt.xticks(pos, ["random movement", "informed movement"])
-    else:
-        plt.xlabel(atype) 
-        axes = plt.gca() 
-        axes.set_xlim([0,end + step])
-    plt.savefig(default_path + "/combinedplots/LH_"+ atype + "/Trait Value")
-    plt.clf()
-    
-    bp0 = plt.boxplot(HM0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    bp1 = plt.boxplot(HM1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp1['boxes'], color='green', alpha = 0.3)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp1['fliers'], color='green')
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp1['whiskers'], color='green')
-    plt.setp(bp0['medians'], color='red')
-    plt.setp(bp1['medians'], color='green')
-    plt.title('habitat mismatch')
-    plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'))
-    if atype == "both":
-        plt.xticks(pos, ["random movement", "informed movement"])
-    else:
-        plt.xlabel(atype) 
-        axes = plt.gca() 
-        axes.set_xlim([0,end + step])
-    plt.ylabel('habitat mismatch')
-    plt.savefig(default_path + "/combinedplots/LH_"+ atype + "/Habitat Mismatch")
-    plt.clf()
-    
-    bp0 = plt.boxplot(popsizes0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    bp1 = plt.boxplot(popsizes1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp1['fliers'], color='green')
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp1['boxes'], color='green', alpha = 0.3)
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp1['whiskers'], color='green')
-    plt.setp(bp0['medians'], color='red')
-    plt.setp(bp1['medians'], color='green')
-    plt.title('metapopulation size') 
-    plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'))
-    if atype == "both":
-        plt.xticks(pos, ["random movement", "informed movement"])
-    else:
-        plt.xlabel(atype) 
-        axes = plt.gca() 
-        axes.set_xlim([0,end + step])
-    plt.ylabel('population size') 
-    plt.savefig(default_path + "/combinedplots/LH_"+ atype + "/Population Sizes")
-    plt.clf()
-    
-    bp0 = plt.boxplot(dispprop0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    bp1 = plt.boxplot(dispprop1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-    plt.setp(bp0['fliers'], color='red')
-    plt.setp(bp1['fliers'], color='green')
-    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-    plt.setp(bp1['boxes'], color='green', alpha = 0.3)
-    plt.setp(bp0['whiskers'], color='red')
-    plt.setp(bp1['whiskers'], color='green')
-    plt.setp(bp0['medians'], color='red')
-    plt.setp(bp1['medians'], color='green')
-    plt.title('dispersal propensity')
-    plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'))
-    plt.xlabel(atype) 
-    if atype == "both":
-        plt.xticks(pos, ["random movement", "informed movement"])
-    else:
-        axes = plt.gca() 
-        axes.set_xlim([0,end + step])
-    plt.ylabel('dispersal propensity')
-    plt.savefig( default_path + "/plots/LH_"+ atype + "/Dispersal_propensity")
-    plt.clf()
-    
+    combinedplot(alpha0, alpha1, 'local population variability', 'alpha variability')
+    combinedplot(gamma0, gamma1, 'metapopulation variability', 'gamma variability')
+    combinedplot(beta0, beta1, 'metapopulation asynchrony', 'beta variability')
+    combinedplot(div0, div1, 'muT')
+    combinedplot(HM0, HM1, 'habitat mismatch')
+    combinedplot(popsizes0, popsizes1, 'metapopulation size', 'individuals')
+    combinedplot(dispprop0, dispprop1, 'dispersal probability')
     
     if atype != "varT":
         NB0 = np.load(default_path + '/data/'+ atype + '0/NB.npy')
         NB1 = np.load(default_path + '/data/'+ atype + '1/NB.npy')
-        bp0 = plt.boxplot(NB0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-        bp1 = plt.boxplot(NB1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-        plt.setp(bp0['fliers'], color='red')
-        plt.setp(bp1['fliers'], color='green')
-        plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-        plt.setp(bp1['boxes'], color='green', alpha = 0.3)
-        plt.setp(bp0['whiskers'], color='red')
-        plt.setp(bp1['whiskers'], color='green')
-        plt.setp(bp0['medians'], color='red')
-        plt.setp(bp1['medians'], color='green')
-        plt.title('niche width')
-        plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'))
-        if atype == "both":
-            plt.xticks(pos, ["random movement", "informed movement"])
-        else:
-            plt.xlabel(atype) 
-            axes = plt.gca() 
-            axes.set_xlim([0,end + step])
-        plt.ylabel('niche width')
-        plt.savefig(default_path + "/combinedplots/LH_"+ atype + "/Niche Breadth")   
-        plt.clf()
+        combinedplot(NB0, NB1, 'niche width')
  
     if atype != "dispersal":
         TH0 = np.load(default_path + '/data/'+ atype + '0/TH.npy')
         TH1 = np.load(default_path + '/data/'+ atype + '1/TH.npy')
-        bp0 = plt.boxplot(TH0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-        bp1 = plt.boxplot(TH1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
-        plt.setp(bp0['fliers'], color='red')
-        plt.setp(bp1['fliers'], color='green')
-        plt.setp(bp0['boxes'], color='red', alpha = 0.3)
-        plt.setp(bp1['boxes'], color='green', alpha = 0.3)
-        plt.setp(bp0['whiskers'], color='red')
-        plt.setp(bp1['whiskers'], color='green')
-        plt.setp(bp0['medians'], color='red')
-        plt.setp(bp1['medians'], color='green')
-        plt.title('dispersal threshold')
-        plt.ylabel('dispersal threshold')
-        plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'))
-        if atype == "both":
-            plt.xticks(pos, ["random movement", "informed movement"])
-        else:
-            plt.xlabel(atype) 
-            axes = plt.gca() 
-            axes.set_xlim([0,end + step])
-        
-        plt.savefig(default_path + "/combinedplots/LH_"+ atype + "/Threshold")   
-        plt.clf() 
-
+        combinedplot(TH0, TH1, 'dispersal threshold')
     
+    
+       
 def LH_dispersal(iters, start, end, step):
     '''
-    evolved values of life metapopulation and history parameters regressed for dispersal
+    Generate a run with a set of tested fixed dispersal values and save the life-history data in files
     '''
     
     mutable_threshold = 0
@@ -446,7 +194,7 @@ def LH_dispersal(iters, start, end, step):
     
 def LH_varT(iters, start, end, step):
     '''
-    evolved values of metapopulation and life history parameters regressed for varT
+    Generate a run with a set of tested niche widths and save the life-history data in files
     '''
     mutable_threshold = 1
     mutable_variability = 0
@@ -525,6 +273,11 @@ def resource_dispersal(iters, start, end, step):
     plt.show()
 
 def run(MAXTIME, dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_dispersal, mutable_variability, directed, cost):
+    '''
+    helper function that initiates a metapopulation and let it evolve for a given amount of generations
+    dispersal and niche width are either evolvable or not, with initial values passed (important for fixed traits), dispersal is directed or not
+    '''
+    
     meta = Metapopulation(dim,dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_dispersal, mutable_variability, directed, cost)
     
     meta.loadlandscape()
@@ -535,74 +288,6 @@ def run(MAXTIME, dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mu
         meta.lifecycle()
         print ("popsize: {}\n".format(len(meta.population)))
     return(meta)
-
-def Trait_Distribution_Analyses():
-    mutable_threshold, mutable_variability = 1, 1    
-    meta = Metapopulation(dim,dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_threshold, mutable_variability, directed, cost)
-    
-    meta.loadlandscape()
-    for timer in range(MAXTIME):
-        print('generation ',timer)
-    
-        meta.lifecycle()
-        print(len(meta.population))
-    meta.Diversity_analysis()
-    meta.Landscape_analysis()
-    meta.Habitatmatch_analysis()
-    if mutable_variability:
-        meta.Niche_breadth_analysis()
-    if mutable_threshold:
-        meta.Dispersal_distance_analysis()
-    
-
-def Local_density_reg_in_time(x, y):
-    mutable_threshold, mutable_variability = 1, 1    
-    meta = Metapopulation(dim,dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_threshold, mutable_variability, directed, cost)
-    ys = []
-    meta.loadlandscape()
-    for timer in range(MAXTIME):
-        print('generation ',timer)
-    
-        meta.lifecycle()
-        ys.append(np.log(meta.localsizes[-1][x][y])/np.log(meta.localsizes[-2][x][y]))
-        print(len(meta.population))
-        
-    plt.plot(range(MAXTIME), ys)
-    plt.title('density regulation at {}, {}'.format(x, y))
-    plt.show()
-    
-def Local_dens_reg_adaptation(iters, start, end, step):
-    xs = []
-    xs_ = []
-    ys = []
-    
-    mutable_threshold, mutable_variability = 1, 1    
-    
-    for initialmaxd in range(start, end+1, step):
-        
-        
-        for n in range(iters):
-            
-            meta = run(MAXTIME, dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_threshold, mutable_variability, directed, cost)
-            if n == 0 and initialmaxd == start:
-                meta.visual.canvas.update()
-            densreg = np.log(meta.localsizes[-1])/np.log(meta.localsizes[-2])
-            for x in range(meta.max_x):
-                for y in range(meta.max_y):
-                    listadapt = meta.localadapt[x][y]
-                    listadapt_ = meta.localadapt_[x] [y]
-                    xs.append(sum(listadapt)/len(listadapt))
-                    xs_.append(sum(listadapt_)/len(listadapt_))
-                    ys.append(densreg[x, y])
-        print(initialmaxd)
-    
-    plt.scatter(xs, ys)
-    plt.title('density regulation (maladaptation of current generation')   
-    plt.show()
-    
-    plt.scatter(xs_, ys)
-    plt.title('density regulation (maladaptation of previous generation')   
-    plt.show()
     
     
 def LH_both(iters):
