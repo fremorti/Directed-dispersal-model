@@ -336,7 +336,7 @@ def LHcombinedplot(pos, atype, widths):
         axes = plt.gca() 
         axes.set_xlim([0,end + step])
     plt.ylabel('dispersal propensity')
-    plt.savefig( default_path + "/plots/LH_"+ atype + "/Dispersal_propensity")
+    plt.savefig( default_path + "/combinedplots/LH_"+ atype + "/Dispersal_propensity")
     plt.clf()
     
     
@@ -846,7 +846,7 @@ K_res = 1
 initialmaxd = 2
 initialvarT = 0.05
 initialthreshold = 0.1
-directed = 0
+directed = 1
 cost = 0 #cost of directed dispersal
 
 iters = 30      #30   
@@ -855,6 +855,6 @@ end = 0.5
 step = 0.025
 
 
-LH_varT(iters, start, end, step)
+LH_both(iters)
 #LHplot(np.arange(start, end+step, step), 'dispersal', directed, step/2)
 #LHcombinedplot(np.arange(start, end+step, step), 'dispersal', step/2)

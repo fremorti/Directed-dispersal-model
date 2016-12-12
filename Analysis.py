@@ -127,7 +127,7 @@ def LHcombinedplot(pos, atype, widths):
     
     
        
-def LH_dispersal(iters, start, end, step):
+def LH_dispersal(iters, start, end, step, cost = 0):
     '''
     Generate a run with a set of tested fixed dispersal values and save the life-history data in files
     '''
@@ -139,7 +139,7 @@ def LH_dispersal(iters, start, end, step):
     disps = np.arange(start, end+step, step) 
     div = np.zeros([iters, len(disps)])                 #Dictionary of mean diversity (muT) for each run
     NB = np.zeros([iters, len(disps)])                    #same for niche breadth (varT)
-    HM = np.zeros([iters, len(disps)])   
+    HM = np.zeros([iters, len(disps)])
     TH = np.zeros([iters, len(disps)])  
     alpha = np.zeros([iters, len(disps)])  
     gamma = np.zeros([iters, len(disps)])   
@@ -147,7 +147,6 @@ def LH_dispersal(iters, start, end, step):
     popsizes = np.zeros([iters, len(disps)])
     dispprop =  np.zeros([iters, len(disps)])
     
-    _, axes = plt.subplots(nrows=len(disps)//3+1, ncols=3)
     for n, initialthreshold in enumerate(disps):    
         
         for m in range(iters):
@@ -174,9 +173,6 @@ def LH_dispersal(iters, start, end, step):
             beta[m][n] = pow(np.sum(localstddev), 2)/globalvar
             
         print(initialmaxd)
-        axes[n//3][n%3].hist(nichebr, bins = 20, range = (0,1.2))
-        axes[n//3][n%3].set_title(str(initialthreshold))
-    plt.show()
     
     
     
@@ -192,7 +188,7 @@ def LH_dispersal(iters, start, end, step):
     LHplot(disps, "dispersal", directed, step/2)
       
     
-def LH_varT(iters, start, end, step):
+def LH_varT(iters, start, end, step, cost = 0):
     '''
     Generate a run with a set of tested niche widths and save the life-history data in files
     '''
@@ -211,7 +207,6 @@ def LH_varT(iters, start, end, step):
     popsizes = np.zeros([iters, len(varTs)])  
     dispprop =  np.zeros([iters, len(varTs)])
     
-    _, axes = plt.subplots(nrows=len(varTs)//3+1, ncols=3)
     for n, initialvarT in enumerate(varTs):    
         for m in range(iters):
             
@@ -235,9 +230,6 @@ def LH_varT(iters, start, end, step):
             gamma[m][n] = globalvar/pow(globalmean, 2)
             beta[m][n] = pow(np.sum(localstddev), 2)/globalvar
         print(initialmaxd)
-        axes[n//3][n%3].hist(thresholds, bins = 20, range = (0,1.2))
-        axes[n//3][n%3].set_title(str(initialvarT))
-    plt.show()
     
     
     np.save(default_path + '/data/varT'+ str(directed) +'/alpha', alpha)
@@ -290,7 +282,7 @@ def run(MAXTIME, dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mu
     return(meta)
     
     
-def LH_both(iters):
+def LH_both(iters, cost = 0):
     '''
     evolved values of metapopulation and life history parameters regressed for varT
     '''
@@ -390,7 +382,83 @@ def LHbothplot():
     bothplot(NB, 'niche width')
     bothplot(TH, 'dispersal threshold')
 
-   
+def LH_cost(iters, start, end, step, function, costs, directed):
+    
+    types = {LH_dispersal:'dispersal', LH_varT:'varT', LH_both:'both'}
+    
+    
+    xvals = np.arange(start, end+step, step) 
+    div_ = np.zeros([len(costs), len(xvals)])                 #Dictionary of mean diversity (muT) for each run
+    HM_ = np.zeros([len(costs), len(xvals)])
+    alpha_ =  np.zeros([len(costs), len(xvals)]) 
+    gamma_ =  np.zeros([len(costs), len(xvals)])
+    beta_ =  np.zeros([len(costs), len(xvals)])
+    popsizes_ =  np.zeros([len(costs), len(xvals)])
+    dispprop_ =   np.zeros([len(costs), len(xvals)])
+    if function != LH_dispersal:
+        TH = np.load(default_path + '/data/'+ types[function] + str(directed) + '/TH.npy')
+        TH_ =  np.zeros([len(costs), len(xvals)])
+    if function != LH_varT:
+        NB = np.load(default_path + '/data/'+ types[function] + str(directed) + '/NB.npy')
+        NB_ = np.zeros([len(costs), len(xvals)])                 #same for niche breadth (varT)
+    
+     
+    for n,cost in enumerate(costs):
+        function(iters, start, end, step, cost)
+        alpha    = np.load(default_path + '/data/'+ types[function] + str(directed)+'/alpha.npy')
+        gamma    = np.load(default_path + '/data/'+ types[function] + str(directed)+'/gamma.npy')
+        beta     = np.load(default_path + '/data/'+ types[function] + str(directed)+'/beta.npy')
+        div      = np.load(default_path + '/data/'+ types[function] + str(directed)+'/div.npy')
+        HM       = np.load(default_path + '/data/'+ types[function] + str(directed)+'/HM.npy')
+        popsizes = np.load(default_path + '/data/'+ types[function] + str(directed)+'/popsizes.npy')
+        dispprop = np.load(default_path + '/data/'+ types[function] + str(directed)+'/dispprop.npy')
+        div_[n] = [np.average([div[x][i] for x in range(iters)]) for i in range(len(xvals))]
+        HM_[n] = [np.average([HM[x][i] for x in range(iters)]) for i in range(len(xvals))]
+        alpha_[n] = [np.average([alpha[x][i] for x in range(iters)]) for i in range(len(xvals))]
+        gamma_[n] = [np.average([gamma[x][i] for x in range(iters)]) for i in range(len(xvals))]
+        beta_[n] = [np.average([beta[x][i] for x in range(iters)]) for i in range(len(xvals))]
+        popsizes_[n] = [np.average([popsizes[x][i] for x in range(iters)]) for i in range(len(xvals))]
+        dispprop_[n] = [np.average([dispprop[x][i] for x in range(iters)]) for i in range(len(xvals))]
+        if function != LH_dispersal:
+            TH_ = np.load(default_path + '/data/'+ types[function] + str(directed)+'/TH.npy')
+            TH_[n] = [np.average([TH[x][i] for x in range(iters)]) for i in range(len(xvals))]
+        if function != LH_varT:
+            NB_ = np.load(default_path + '/data/'+ types[function] + str(directed)+'/NB.npy')
+            NB_[n] = [np.average([NB[x][i] for x in range(iters)]) for i in range(len(xvals))]
+        
+    np.save(default_path + '/data/cost/'+ types[function]+ str(directed) +'/alpha', alpha_)
+    np.save(default_path + '/data/cost/'+ types[function]+ str(directed) +'/gamma', gamma_)
+    np.save(default_path + '/data/cost/'+ types[function]+ str(directed) +'/beta', beta_)
+    np.save(default_path + '/data/cost/'+ types[function]+ str(directed) +'/div', div_) 
+    np.save(default_path + '/data/cost/'+ types[function]+ str(directed) +'/HM', HM_)
+    np.save(default_path + '/data/cost/'+ types[function]+ str(directed) +'/popsizes', popsizes_)
+    np.save(default_path + '/data/cost/'+ types[function]+ str(directed) +'/dispprop', dispprop_)
+    if function != LH_dispersal:
+        np.save(default_path + '/data/cost/'+ types[function]+ str(directed) +'/TH', TH_)
+    if function != LH_varT:
+        np.save(default_path + '/data/cost/'+ types[function]+ str(directed) +'/NB_', NB_)
+    
+    LHcostplots(start, end, step, atype, directed, costs)
+        
+def LHcostplots(start, end, step, atype, directed, costs):
+    alpha    = np.load(default_path + '/data/cost/'+ atype + str(directed)+'/alpha.npy')
+    gamma    = np.load(default_path + '/data/cost/'+ atype + str(directed)+'/gamma.npy')
+    beta     = np.load(default_path + '/data/cost/'+ atype + str(directed)+'/beta.npy')
+    div      = np.load(default_path + '/data/cost/'+ atype + str(directed)+'/div.npy')
+    HM       = np.load(default_path + '/data/cost/'+ atype + str(directed)+'/HM.npy')
+    popsizes = np.load(default_path + '/data/cost/'+ atype + str(directed)+'/popsizes.npy')
+    dispprop = np.load(default_path + '/data/cost/'+ atype + str(directed)+'/dispprop.npy')
+    cols = ['b', 'r', 'g', 'coral', 'darkmagenta', 'steelblue', 'brown']
+    xs = np.arange(start, end+step, step)
+    plt.plot(xs, np.transpose(alpha))
+    plt.show()
+    
+    plt.plot(xs, np.transpose(popsizes))
+    plt.show()
+    
+        
+    
+    
 '''
 Default PARAMETERS
 '''
@@ -402,14 +470,14 @@ K_res = 1
 initialmaxd = 2
 initialvarT = 0.05
 initialthreshold = 0.1
-directed = 1
+directed = 0
 cost = 0 #cost of directed dispersal
-
+costs = [0, 0.1, 0.5, 1, 2, 3]
 iters = 30      #30   
 start = 0.25   #20 steps in total start-stop
 end = 5
 step = 0.25
-
-
-LH_dispersal(iters, start, end, step)
+atype = 'dispersal'
+#LHcostplots(start, end, step, atype, directed, costs)
+LH_cost(iters, start, end, step, LH_dispersal, costs, directed)
 #LHcombinedplot(np.arange(start, end+step, step), 'dispersal', step/2)
