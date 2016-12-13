@@ -222,8 +222,7 @@ def LH_varT(iters, start, end, step, cost = 0):
             diversity = [ind.muT for ind in meta.population]
             thresholds = [ind.threshold for ind in meta.population]
             habitatmatch = [ind.muT-meta.environment[ind.y][ind.x] for ind in meta.population]
-            if len(diversity) == 0:
-                print('gg')
+
             div[m][n] = sum(diversity)/len(diversity)
             TH[m][n] = sum(thresholds)/len(thresholds)
             HM[m][n] = abs(sum(habitatmatch)/len(habitatmatch))
@@ -434,7 +433,7 @@ def LH_cost(iters, start, end, step, function, costs, directed):
             NB = np.load(default_path + '/data/'+ types[function] + str(directed) + '/NB.npy')
             NB_ = np.load(default_path + '/data/'+ types[function] + str(directed)+'/NB.npy')
             NB_[n] = [np.average([NB[x][i] for x in range(iters)]) for i in range(len(xvals))]
-        print('gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg)')
+
     if not os.path.exists(default_path + '/data/cost/'+ types[function]+ str(directed)):
         os.makedirs(default_path + '/data/cost/'+ types[function]+ str(directed))
     np.save(default_path + '/data/cost/'+ types[function]+ str(directed) +'/alpha', alpha_)

@@ -285,8 +285,7 @@ class Metapopulation:
             else:
                 #deplete resources, but no reproduction (fitness dependent on environmnet only, not resources)
                 self.resources[ind.x, ind.y] = 0
-        if not(oldpopsize):
-            print('gg')
+
         self.disp_prop = movenumber/oldpopsize
         indcoords = [(ind.x, ind.y) for ind in self.population] #array with all coords of the individuals
         localpopsize = [indcoords.count((x, y)) for y in range(self.max_y) for x in range(self.max_x) if indcoords.count((x, y))]
