@@ -146,9 +146,9 @@ initialmaxd = 2
 initialvarT = 0.05
 initialthreshold = 0.1
 directed = 0
-cost = sys.argv[1] #cost of directed dispersal
-disp = sys.argv[2]
-rep  = sys.argv[3]
+cost = 0.1 #cost of directed dispersal
+disp = 1
+rep  = 1
 
 
 #LHcostplots(start, end, step, atype, directed, costs)
