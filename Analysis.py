@@ -461,8 +461,8 @@ def LHcostplots(start, end, step, atype, directed, costs):
     #cols = ['b', 'r', 'g', 'coral', 'darkmagenta', 'steelblue', 'brown']
     xs = np.arange(start, end+step, step)
     
-    if not os.path.exists(default_path + "/plots/cost/LH_"+ atype + str(directed) +'/' + str(cost)):
-        os.makedirs(default_path + "/plots/cost/LH_"+ atype + str(directed) +'/' + str(cost))
+    if not os.path.exists(default_path + "/plots/cost/LH_"+ atype + str(directed)):
+        os.makedirs(default_path + "/plots/cost/LH_"+ atype + str(directed))
     def plot(y, title, ylab=''):
         pl0 = plt.plot(xs, np.transpose(y))
         plt.title(title)
@@ -470,7 +470,7 @@ def LHcostplots(start, end, step, atype, directed, costs):
         axes = plt.gca() 
         axes.set_xlim([0,end + step])
         plt.ylabel(ylab)
-        plt.savefig( default_path + "/plots/cost/LH_"+ atype + str(directed) +'/' + str(cost) + "/{}".format(title))
+        plt.savefig( default_path + "/plots/cost/LH_"+ atype + str(directed) + "/{}".format(title))
         plt.clf()
     
     plot(alpha, 'local population variability', 'alpha variability')
@@ -497,7 +497,7 @@ Default PARAMETERS
 '''
 
 MAXTIME=10  #50
-dim = 8
+dim = 32
 R_res = 0.25
 K_res = 1  
 initialmaxd = 2
@@ -514,5 +514,5 @@ atype = 'dispersal'
 
 
 #LHcostplots(start, end, step, atype, directed, costs)
-LH_cost(iters, start, end, step, LH_varT, costs, directed)
+LH_dispersal(iters, start, end, step, cost)
 #LHcombinedplot(np.arange(start, end+step, step), 'dispersal', step/2)
