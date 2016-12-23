@@ -38,7 +38,7 @@ class Individual:
         self.h=0.2          #handling time
         self.directed = directed
            
-        self.sigma=300 - directed*100*cost_of_disp         #conversion factor
+        self.sigma=300 - directed*cost_of_disp         #conversion factor
         
 
         

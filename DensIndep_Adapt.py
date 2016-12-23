@@ -6,54 +6,10 @@ Same as adapt14 but with density independent dispersal
 '''
 
 import random as rnd
-import tkinter as tk
 import numpy as np
-import matplotlib.pyplot as plt
 import math as math
 
 
-class Visual:
-    '''This class arranges the visual output.'''
-    def __init__(self, max_x, max_y):
-        '''Initialize the visual class'''
-        self.zoom = 15
-        self.max_x = max_x
-        self.max_y = max_y
-        self.root = tk.Tk()
-        self.canvas = tk.Canvas(self.root, 
-                                width =  self.max_x * self.zoom, 
-                                height = self.max_y * self.zoom) #create window
-        self.canvas.pack()
-        self.canvas.config(background = 'white')
-        self.squares = np.empty((self.max_x, self.max_y),dtype=object)
-        self.initialize_squares()
-                                       
-        
-    def color_square(self, resources, x, y):
-        '''Changes the color of the square'''        
-        color = (resources)/float(100)
-        if color < 0:
-            color = 0
-        elif color > 1:
-            color = 1  
-        green = int(255 * color)
-        red = 255 - green        
-        blue = 0
-        rgb = red, green, blue     
-        hex_code = '#%02x%02x%02x' % rgb        
-        self.canvas.itemconfigure(self.squares[x, y],fill=str(hex_code))
-        
-    def initialize_squares(self):
-        '''returns a square (drawing object)'''
-        for x in range(self.max_x):
-            for y in range(self.max_y):
-                self.squares[x, y] = self.canvas.create_rectangle(self.zoom * x,
-                                                     self.zoom * y, 
-                                                     self.zoom * x + self.zoom,
-                                                     self.zoom * y + self.zoom,
-                                                     outline = 'black', 
-                                                     fill = 'black')
-                
 
 
 class Individual:
@@ -81,7 +37,7 @@ class Individual:
         self.h=0.2          #handling time
         self.directed = directed
            
-        self.sigma=300 - directed*100*cost_of_disp         #conversion factor
+        self.sigma=300 - directed*cost_of_disp         #conversion factor
         
 
         
@@ -177,7 +133,6 @@ class Metapopulation:
         '''Initialization'''           
         self.max_x = max_x
         self.max_y = max_y
-        self.visual = Visual(self.max_x, self.max_y)
         self.res_R = res_R  
         self.res_K = res_K    
         self.initialmaxd = initialmaxd
@@ -304,71 +259,7 @@ class Metapopulation:
         #=======================================================================
         
 
-        
-    def Landscape_analysis(self):
-        '''title='Landscape_output.txt'
-       
-        output=open(title,'w')
-        output.write('x'+'\t'+'y'+'\t'+'habitatcolour'+'\t'+'Resources'+'\n')
-        
-        for x in range(self.max_x):
-            for y in range(self.max_y):
-                output.write(str(x)+'\t'+str(y)+'\t'+str(self.environment[x,y])+'\t'+str(self.resources[x,y])+'\n')
-        
-        output.close()'''
-        
-        data = [self.environment[y][x] for x in range(self.max_x) for y in range(self.max_y)]
-        plt.hist(data, bins = np.arange(0, 1, 0.05))
-        plt.title('habitat density')
-        plt.savefig("C:/Users/frederik/Documents/Integrated research project/plots/Trait Distribution/Landscape Distribution.jpeg")
-        plt.clf()
-        
-        
-    def Diversity_analysis(self):
-        '''title='IndividualTrait_output.txt'
-       
-        output=open(title,'w')
-        output.write('x'+'\t'+'y'+'\t'+'habitatcolour'+'\t'+'Resources'+'\t'+'muT'+'\t'+'varT'+'\t'+'disp'+'\n')
-        
-        print(len(self.population))
-        for ind in self.population:
-            output.write(str(ind.x)+'\t'+str(ind.y)+'\t'+str(self.environment[ind.x,ind.y])+'\t'+str(self.resources[ind.x,ind.y])+'\t'+str(ind.muT)+'\t'+str(ind.varT)+'\t'+str(ind.disp)+'\n')
-        
-        output.close()'''    
-        
-        
-        data = [ind.muT for ind in self.population]
-        plt.hist(data, bins = np.arange(0, 1, 0.05))
-        plt.title('muT density')
-        plt.savefig("C:/Users/frederik/Documents/Integrated research project/plots/Trait Distribution/muT Distribution.jpeg")
-        plt.clf()
     
-    def Niche_breadth_analysis(self):
-        
-        data = [ind.varT for ind in self.population]
-        plt.hist(data, bins = np.arange(0, 1, 0.05))
-        plt.title('varT density')
-        plt.savefig("C:/Users/frederik/Documents/Integrated research project/plots/Trait Distribution/Niche Breath Distribution.jpeg")
-        plt.clf()
-        
-    def Dispersal_distance_analysis(self):
-        
-        data = [ind.maxd for ind in self.population]
-        plt.hist(data, bins = range(0, max(data)+2, 1))
-        plt.title('max. distance density')
-        plt.savefig("C:/Users/frederik/Documents/Integrated research project/plots/Trait Distribution/Dispersal Distance Distribution.jpeg")
-        plt.clf() 
-    
-   
-
-    def Habitatmatch_analysis(self):
-        
-        data = np.array([ind.muT-self.environment[ind.y][ind.x] for ind in self.population])
-        plt.hist(data, bins = np.arange(0, 1, 0.05))
-        plt.title('habitat match')
-        plt.savefig("C:/Users/frederik/Documents/Integrated research project/plots/Trait Distribution/Habitat Match Distribution.jpeg")
-        plt.clf()
-        
     
     def loadlandscape(self):
         rando = 1
@@ -377,16 +268,7 @@ class Metapopulation:
             for x in range(self.max_x):
                 for y in range(self.max_y):
                     self.environment[x,y]=rnd.random()
-                    self.visual.color_square(self.environment[x,y]*100, x, y)
-                    """
-            for x in range(self.max_x):
-                for y in range(self.max_y):
-                    if rnd.random()>0.5:
-                        self.environment[x,y] = 0.7
-                    else:
-                        self.environment[x,y] = 0.2
-                    self.visual.color_square(self.environment[x,y]*100, x, y)"""
-        
+
         else:    
             FileToLaoad='MatrixLandscape16.txt'
             
@@ -397,4 +279,3 @@ class Metapopulation:
                 for y in range(self.max_y):
                     basicquality=table[x,y]
                     self.environment[x,y]=basicquality
-                    self.visual.color_square(self.environment[x,y]*100, x, y)

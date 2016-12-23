@@ -43,9 +43,9 @@ def LH_dispersal(disp, rep, cost = 0):
     
     
     
-    if not os.path.exists(default_path + '/data/dispersal/'+ str(directed) +'/' + str(disp)):
-        os.makedirs(default_path + '/data/dispersal/'+ str(directed) +'/' + str(disp))
-    np.save(default_path + '/data/dispersal/'+ str(directed) +'/' + str(disp) + '/rep'+ str(rep), data)
+    if not os.path.exists(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(disp)):
+        os.makedirs(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(disp))
+    np.save(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(disp) + '/rep'+ str(rep), data)
 
       
     
@@ -78,9 +78,9 @@ def LH_varT(var, rep, cost = 0):
     data[6] = globalvar/pow(globalmean, 2)
     data[7] = pow(np.sum(localstddev), 2)/globalvar
     
-    if not os.path.exists(default_path + '/data/varT/'+ str(directed) +'/' + str(var)):
-        os.makedirs(default_path + '/data/varT/'+ str(directed) +'/' + str(var))
-    np.save(default_path + '/data/varT/'+ str(directed) +'/' + str(var) + '/rep'+ str(rep), data)
+    if not os.path.exists(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(var)):
+        os.makedirs(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(var))
+    np.save(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(var) + '/rep'+ str(rep), data)
        
 
 
@@ -128,9 +128,9 @@ def LH_both(directed, rep, cost = 0):
     data[7] = globalvar/pow(globalmean, 2)
     data[8] = pow(np.sum(localstddev), 2)/globalvar
         
-    if not os.path.exists(default_path + '/data/both/' + str(directed)):
-        os.makedirs(default_path + '/data/both/' + str(directed))
-    np.save(default_path + '/data/both/' + str(directed) + '/' + str(rep), data)
+    if not os.path.exists(default_path + '/data/both/' + str(directed) + '/'+ str(cost)):
+        os.makedirs(default_path + '/data/both/' + str(directed) + '/'+ str(cost))
+    np.save(default_path + '/data/both/' + str(directed) + '/'+ str(cost)+ '/' + str(rep), data)
         
     
     
@@ -145,9 +145,9 @@ K_res = 1
 initialmaxd = 2
 initialvarT = 0.05
 initialthreshold = 0.1
-directed = 0
-cost = sys.argv[1] #cost of directed dispersal
-disp = sys.argv[2]
+directed = 1    
+cost = float(sys.argv[1]) #cost of directed dispersal
+disp = float(sys.argv[2])
 rep  = sys.argv[3]
 
 
