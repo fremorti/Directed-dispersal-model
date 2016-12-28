@@ -496,7 +496,7 @@ def LHcostplots(start, end, step, atype, directed, costs):
 Default PARAMETERS
 '''
 
-MAXTIME=10  #50
+MAXTIME=50  #50
 dim = 32
 R_res = 0.25
 K_res = 1  

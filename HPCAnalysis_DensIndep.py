@@ -14,7 +14,7 @@ default_path = os.getcwd()
 
 
 
-def LH_dispersal(disp, rep, cost = 0):
+def LH_dispersal(initialthreshold, rep, cost = 0):
     '''
     Generate a run with a set of tested fixed dispersal values and save the life-history data in files
     '''
@@ -44,13 +44,13 @@ def LH_dispersal(disp, rep, cost = 0):
     
     
     
-    if not os.path.exists(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(disp)):
-        os.makedirs(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(disp))
-    np.save(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(disp) + '/rep'+ str(rep), data)
+    if not os.path.exists(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialthreshold)):
+        os.makedirs(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialthreshold))
+    np.save(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialthreshold) + '/rep'+ str(rep), data)
 
       
     
-def LH_varT(var, rep, cost = 0):
+def LH_varT(initialvarT, rep, cost = 0):
     '''
     Generate a run with a set of tested niche widths and save the life-history data in files
     '''
@@ -79,9 +79,9 @@ def LH_varT(var, rep, cost = 0):
     data[6] = globalvar/pow(globalmean, 2)
     data[7] = pow(np.sum(localstddev), 2)/globalvar
     
-    if not os.path.exists(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(var)):
-        os.makedirs(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(var))
-    np.save(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(var) + '/rep'+ str(rep), data)
+    if not os.path.exists(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialvarT)):
+        os.makedirs(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialvarT))
+    np.save(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialvarT) + '/rep'+ str(rep), data)
        
 
 
@@ -92,7 +92,6 @@ def run(MAXTIME, dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mu
     '''
     
     meta = Metapopulation(dim,dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_dispersal, mutable_variability, directed, cost)
-    
     meta.loadlandscape()
     
     for timer in range(MAXTIME):
@@ -146,7 +145,7 @@ K_res = 1
 initialmaxd = 2
 initialvarT = 0.05
 initialthreshold = 0.1
-directed = 1    
+directed = 0    
 cost = float(sys.argv[1]) #cost of directed dispersal
 disp = float(sys.argv[2])
 rep  = sys.argv[3]
