@@ -139,17 +139,17 @@ Default PARAMETERS
 '''
 
 MAXTIME=50  #50
-dim = 8
+dim = 32
 R_res = 0.25
 K_res = 1  
 initialmaxd = 2
 initialvarT = 0.05
 initialthreshold = 0.1
-directed = 0    
+directed = 1   
 cost = float(sys.argv[1]) #cost of directed dispersal
 disp = float(sys.argv[2])
 rep  = sys.argv[3]
 
 #LHcostplots(start, end, step, atype, directed, costs)
-LH_dispersal(disp, rep,cost)
+LH_varT(disp, rep,cost)
 #LHcombinedplot(np.arange(start, end+step, step), 'dispersal', step/2)
