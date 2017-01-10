@@ -12,7 +12,6 @@ import numpy as np
 import math as math
 
 
-
 class Individual:
     '''Class that regulates individuals and their properties'''
     def __init__(self,
@@ -57,13 +56,13 @@ class Individual:
         
             
             
-        g = [x for x in range(self.x-self.maxd, self.x+self.maxd+1) if 0<=x<len(env)]
-        h = [y for y in range(self.y-self.maxd, self.y+self.maxd+1) if 0<=y<len(env)]
+        g = [x%len(env) for x in range(self.x-self.maxd, self.x+self.maxd+1)]
+        h = [y%len(env[0]) for y in range(self.y-self.maxd, self.y+self.maxd+1)]
         rnd.shuffle(g)
         rnd.shuffle(h)
         
         if self.directed :
-            diff = 1   
+            diff = abs(self.muT - env[self.x][self.y])   
             for x in g:
                 for y in h:
                     diff_ = abs(self.muT - env[x][y])
@@ -87,11 +86,11 @@ class Individual:
     
     def mutation(self,rate, md, mv):
         if rnd.random()<rate and md : 
-            self.threshold=abs(np.random.normal(self.muT,0.1))
+            self.threshold=abs(np.random.normal(self.threshold,0.1))
             self.threshold = 1 if self.threshold > 1 else self.threshold
             
         if rnd.random()<rate :     
-            self.muT=abs(np.random.normal(self.muT,0.1))
+            self.muT=np.random.normal(self.muT,0.1)
         if rnd.random()<rate and mv : 
             self.varT=rnd.random()
             '''!!!!!!'''
@@ -143,21 +142,16 @@ class Metapopulation:
         self.md = mutable_dispersal
         self.directed = directed
         self.competition = [] # list of resources/ind per lifecycle
-
-        self.TemporalVariance=0.1
+        #self.TemporalVariance=0.1
         self.environment = np.zeros((self.max_x,self.max_y))
         self.resources = np.zeros((self.max_x,self.max_y))
         self.localsizes = []   #list of population sizes at each location for each generation
-        self.localadapt = 'C'
-        self.localadapt_ = 'D'
-        
         self.population = []
         self.cod = cod #cost of directed dispersal (binary: either a cost or no cost)
-        
-        self.initialize_pop()
-        self.CV = []
         self.disp_prop = 0
-        
+
+        self.initialize_pop()
+                
     def initialize_pop(self):
         '''Initialize individuals'''
         startpop = 1000
@@ -183,18 +177,8 @@ class Metapopulation:
             
         #resources grow
         self.resources += self.res_R*(1-self.resources/self.res_K)  
+
         
-              
-        #mutate
-        for ind in self.population:
-            ind.mutation(0.01, self.md, self.mv)     
-        
-        self.localadapt_ = self.localadapt
-        self.localadapt = [[[] for _ in range(self.max_y)] for _ in range(self.max_x)]
-        for ind in self.population:
-            self.localadapt[ind.x][ind.y].append(abs(ind.muT - self.environment[ind.x,ind.y]))
-        
-        #individuals reproduce
         oldpop = self.population[:]
         del self.population[:]
         
@@ -204,26 +188,27 @@ class Metapopulation:
         oldpopsize = len(oldpop)
         for ind in oldpop:
             
-            #In which habitat is the individual
-            localenvironment=self.environment[ind.x,ind.y]
-            #What is the resource density
-            R = self.resources[ind.x, ind.y]
+            #mutate
+            ind.mutation(0.01, self.md, self.mv)
+                     
+            
+            #move
             #calculate how much resources the individual needs to reproduce
-            necessary_resources=ind.resource_use(localenvironment,R)
+            necessary_resources=ind.resource_use(self.environment[ind.x,ind.y],self.resources[ind.x, ind.y])
+            #decide to move according to available resources
             if ind.sigma*necessary_resources < ind.threshold:
                 ind.move(self.max_x, self.max_y, self.environment)
                 movenumber += 1
-                
-            localenvironment=self.environment[ind.x,ind.y]
-            Fitness=ind.fitness(localenvironment,R)
-
-           
             
             
+            #reproduce
+            #if there are enough resources present locally
+            necessary_resources=ind.resource_use(self.environment[ind.x,ind.y],self.resources[ind.x, ind.y])
             if necessary_resources<self.resources[ind.x,ind.y]:
                 #deplete resources if present
                 self.resources[ind.x,ind.y]-=necessary_resources   
-                #survive and reproduce
+                #succesfully reproduce according to your fitness value
+                Fitness=ind.fitness(self.environment[ind.x,ind.y],self.resources[ind.x, ind.y])
                 for _ in range(Fitness):
                     self.population.append(Individual(ind.x,
                                                       ind.y,
@@ -241,24 +226,9 @@ class Metapopulation:
                 self.resources[ind.x, ind.y] = 0
 
         self.disp_prop = movenumber/oldpopsize
-        indcoords = [(ind.x, ind.y) for ind in self.population] #array with all coords of the individuals
-        localpopsize = [indcoords.count((x, y)) for y in range(self.max_y) for x in range(self.max_x) if indcoords.count((x, y))]
-        
-        self.CV.append(np.var(localpopsize)/np.average(localpopsize))
-                     
         self.localsizes.append(np.array([[[(ind.x, ind.y) for ind in self.population].count((x, y)) for x in range(self.max_x)] for y in range(self.max_y)]))
-           
-        #=======================================================================
-        # for x in range(self.max_x):
-        #             for y in range(self.max_y):
-        #                 #self.visual.color_square(self.environment[x,y]*100, x, y)   
-        #                 self.visual.color_square(self.resources[x,y]*50, x, y) 
-        # print ('endpopulation',len(self.population))
-        # self.visual.canvas.update() 
-        #=======================================================================
-        
 
-        
+
     
     def loadlandscape(self):
         rando = 1
@@ -267,15 +237,7 @@ class Metapopulation:
             for x in range(self.max_x):
                 for y in range(self.max_y):
                     self.environment[x,y]=rnd.random()
-                    """
-            for x in range(self.max_x):
-                for y in range(self.max_y):
-                    if rnd.random()>0.5:
-                        self.environment[x,y] = 0.7
-                    else:
-                        self.environment[x,y] = 0.2
-                    self.visual.color_square(self.environment[x,y]*100, x, y)"""
-        
+
         else:    
             FileToLaoad='MatrixLandscape16.txt'
             
@@ -286,11 +248,3 @@ class Metapopulation:
                 for y in range(self.max_y):
                     basicquality=table[x,y]
                     self.environment[x,y]=basicquality
-                    
-                    '''testtest
-        test
-        test
-        test
-        test
-        test
-        '''

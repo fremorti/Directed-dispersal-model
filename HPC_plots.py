@@ -51,11 +51,34 @@ def barplot(y, kind_of_plot, densdep, mode, directed, costs, pos, title, ylab=''
                     .format(kind_of_plot, densdep, mode, str(directed), title))
     plt.clf()
 
+def cplot(y, kind_of_plot, densdep, mode, directed, costs, pos, title, ylab=''):
+    bp0 = plt.boxplot(y[0], positions = pos, sym='.', widths = 0.5*(pos[1]-pos[0]), patch_artist=1, manage_xticks=0)
+    bp1 = plt.boxplot(y[1], positions = pos, sym='.', widths = 0.5*(pos[1]-pos[0]), patch_artist=1, manage_xticks=0)
+    plt.setp(bp0['boxes'], color='red', alpha = 0.3)
+    plt.setp(bp0['fliers'], markerfacecolor='red', markeredgecolor = 'red')
+    plt.setp(bp0['medians'], color='red')
+    plt.setp(bp0['whiskers'], color='black')
+    plt.setp(bp1['boxes'], color='green', alpha = 0.3)
+    plt.setp(bp1['fliers'], markerfacecolor='green', markeredgecolor = 'green')
+    plt.setp(bp1['medians'], color='green')
+    plt.setp(bp1['whiskers'], color='black')
+    plt.title(title)
+    plt.legend((bp0['boxes'][0], bp1['boxes'][0]), ('random', 'directed'), loc = 0)
+    plt.xlabel(mode) 
+    axes = plt.gca() 
+    axes.set_xlim([0,pos[0]+pos[-1]])
+    plt.ylabel(ylab)
+    if not os.path.exists(default_path + "/plots/{}/{}/LH_{}".format(kind_of_plot, densdep, mode)):
+        os.makedirs(default_path + "/plots/{}/{}/LH_{}".format(kind_of_plot, densdep, mode))
+    plt.savefig( default_path + "/plots/{}/{}/LH_{}/{}"
+                    .format(kind_of_plot, densdep, mode, title))
+    plt.clf()
+    
 def plotall(y, kind_of_plot, densdep, mode, directed, costs, pos):
     '''
     Helper function that requests a plot for each separate metric that is followed
     '''
-    func = {'costplot': plot, 'LHplot': barplot}
+    func = {'costplot': plot, 'LHplot': barplot, 'combinedplot': cplot}
     func[kind_of_plot](y[0], kind_of_plot, densdep, mode, directed, costs, pos, 'muT')        
     if mode != "varT":
         func[kind_of_plot](y[1],  kind_of_plot, densdep, mode, directed, costs, pos, 'niche width')
@@ -76,7 +99,9 @@ def LHplot(cost):
             for directed in (0, 1):
                 
                 a = np.array([[np.load(default_path + '/hpcdata/{}/{}/{}/{}/{}/rep{}.npy'
-                                      .format(m_, mode, str(directed), str(float(cost)), str(disp), str(rep))) for rep in range(reps)] for disp in disps[mode]])
+                                      .format(m_, mode, str(directed), str(float(cost)), str(disp), str(rep))) 
+                               for rep in range(reps)] 
+                              for disp in disps[mode]])
                 
                 print(a[0, ..., 1])
                 plotall(np.transpose(a), sys._getframe().f_code.co_name, m_, mode, directed, costs, varis[mode])
@@ -95,5 +120,17 @@ def costplot():
                               for disp in disps[mode]])
                 b = np.average(a, axis = 2)    
                 plotall(np.transpose(b), sys._getframe().f_code.co_name , m_, mode, directed, costs, varis[mode])    
+
+def combinedplot(cost):
+    dd = {'density dependent': 'dd_data'}
+    for _, m_ in dd.items():
+        for mode in ['dispersal', 'varT']:
+            a = np.array([[[np.load(default_path + '/hpcdata/{}/{}/{}/{}/{}/rep{}.npy'
+                                  .format(m_, mode, str(directed), str(float(cost)), str(disp), str(rep)))
+                             for directed in (0, 1)]
+                            for rep in range(reps)]
+                           for disp in disps[mode]])   
+            plotall(np.transpose(a), sys._getframe().f_code.co_name , m_, mode, directed, costs, varis[mode])    
+
                 
 costplot()

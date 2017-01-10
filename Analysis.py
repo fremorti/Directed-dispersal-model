@@ -45,6 +45,9 @@ def LHplot(pos, atype, directed, widths, cost):
         axes = plt.gca() 
         axes.set_xlim([0,end + step])
         plt.ylabel(ylab)
+        if not os.path.exists(default_path + "/plots/LH_"+ atype + str(directed) +'/' + str(cost)):
+            os.makedirs(default_path + "/plots/LH_"+ atype + str(directed) +'/' + str(cost))
+    
         plt.savefig( default_path + "/plots/LH_"+ atype + str(directed) +'/' + str(cost) + "/{}".format(title))
         plt.clf()
     
@@ -89,7 +92,7 @@ def LHcombinedplot(pos, atype, widths):
     
     if not os.path.exists(default_path + "/combinedplots/LH_"+ atype):
         os.makedirs(default_path + "/combinedplots/LH_"+ atype)
-    def combinedplot(y0, y1, title, ylab):
+    def combinedplot(y0, y1, title, ylab=''):
         bp0 = plt.boxplot(y0, positions = pos-0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
         bp1 = plt.boxplot(y1, positions = pos+0.5*widths, sym='.', widths = widths, patch_artist=1, manage_xticks=0)
         plt.setp(bp0['boxes'], color='red', alpha = 0.3)
@@ -497,7 +500,7 @@ Default PARAMETERS
 '''
 
 MAXTIME=50  #50
-dim = 32
+dim = 8
 R_res = 0.25
 K_res = 1  
 initialmaxd = 2
@@ -506,13 +509,14 @@ initialthreshold = 0.1
 directed = 0
 cost = 0 #cost of directed dispersal
 costs = [0, 1]
-iters = 5      #30   
-start = 0.1   #20 steps in total start-stop
+iters = 30      #30   
+start = 0.025   #20 steps in total start-stop
 end = 0.5
-step = 0.1
+step = 0.025
 atype = 'dispersal'
 
 
 #LHcostplots(start, end, step, atype, directed, costs)
-LH_dispersal(iters, start, end, step, cost)
-#LHcombinedplot(np.arange(start, end+step, step), 'dispersal', step/2)
+#LH_varT(iters, start, end, step, cost)
+LHcombinedplot(np.arange(start, end+step, step), 'varT', step/2)
+#LHplot(np.arange(0.25, 5.25, 0.25), "dispersal", directed, step/2, cost)
