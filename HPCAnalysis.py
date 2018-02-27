@@ -4,152 +4,118 @@ Created on 13 dec. 2016
 @author: fremorti
 '''
 
-
-from Adapt import Metapopulation as Metapopulation
+from AdaptNGB import Metapopulation as Metapopulation
 import numpy as np
 import os
 import sys
+import time
+start = time.clock()
 default_path = os.getcwd()
 
 
+#runs model with fixed dispersal trait 
+def LH_dispersal(disp, cost = 0):
+    runall(disp, None, 0, 1, sys._getframe().f_code.co_name)
 
-def LH_dispersal(initialthreshold, rep, cost = 0):
-    '''
-    Generate a run with a set of tested fixed dispersal values and save the life-history data in files
-    '''
-    
-    mutable_threshold = 0
-    mutable_variability = 1
-    meta = run(MAXTIME, dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_threshold, mutable_variability, directed, cost)
-    
-    data = np.zeros(8)
-    diversity = [ind.muT for ind in meta.population]
-    nichebr = [ind.varT for ind in meta.population]
-    habitatmatch = [ind.muT-meta.environment[ind.y][ind.x] for ind in meta.population]
-    data[0] = sum(diversity)/len(diversity)
-    data[1] = sum(nichebr)/len(nichebr)
-    data[2] = abs(sum(habitatmatch)/len(habitatmatch))
-    data[3] = len(meta.population)
-    data[4] = meta.disp_prop
+#run model with fixed niche width trait    
+def LH_varT(disp, cost = 0):
+    runall(None, disp, 1, 0, sys._getframe().f_code.co_name)
 
-    localstddev = [[pow(np.var([size[x][y] for size in meta.localsizes[-5:]]), 0.5) for y in range(dim)] for x in range(dim)]
-    localmean = [[np.mean([size[x][y] for size in meta.localsizes[-5:]]) for y in range(dim)] for x in range(dim)]
-    globalvar = np.var([np.sum(size) for size in meta.localsizes[-5:]])
-    globalmean = np.mean([np.sum(size) for size in meta.localsizes[-5:]])
-    data[5] = pow(np.sum(localstddev)/np.sum(localmean), 2)
-    data[6] = globalvar/pow(globalmean, 2)
-    data[7] = pow(np.sum(localstddev), 2)/globalvar
-            
-    
-    
-    
-    if not os.path.exists(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialthreshold)):
-        os.makedirs(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialthreshold))
-    np.save(default_path + '/data/dispersal/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialthreshold) + '/rep'+ str(rep), data)
+#run model without fixed traits, both traits evolve
+def LH_both(cost = 0):
+    runall(None, None, 1, 1, sys._getframe().f_code.co_name)
 
-      
-    
-def LH_varT(initialvarT, rep, cost = 0):
-    '''
-    Generate a run with a set of tested niche widths and save the life-history data in files
-    '''
-    mutable_threshold = 1
-    mutable_variability = 0
 
+def runall(initialthreshold, initialvarT, mutable_threshold, mutable_variability, mode):
+    meta = run(MAXTIME, dim,R_res,K_res, maxd, initialvarT, initialthreshold, mutable_threshold, mutable_variability, departure, settlement, cost)
     
-    data = np.zeros(8)
-
-    meta = run(MAXTIME, dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_threshold, mutable_variability, directed, cost)
+    #create an array where we calculate 10 metrics of this simulation
+    data = np.zeros(10)
     diversity = [ind.muT for ind in meta.population]
     thresholds = [ind.threshold for ind in meta.population]
-    habitatmatch = [ind.muT-meta.environment[ind.y][ind.x] for ind in meta.population]
-
+    nichebr = [ind.varT for ind in meta.population]
+    habitatmatch = [abs(ind.muT-meta.environment[ind.x][ind.y]) for ind in meta.population]
+    
+    #mean optimal environment trait    
     data[0] = sum(diversity)/len(diversity)
+    #mean dispersal trait
     data[1] = sum(thresholds)/len(thresholds)
-    data[2] = abs(sum(habitatmatch)/len(habitatmatch))
-    data[3] = len(meta.population)
-    data[4] = meta.disp_prop
+    #mean niche width
+    data[2] = sum(nichebr)/len(nichebr)
+    #mean habitat mismatch
+    data[3] = abs(sum(habitatmatch)/len(habitatmatch))
+    #metapopulation size
+    data[4] = len(meta.population)
+    #dispersal propensity
+    data[5] = meta.disp_prop
+    #prospection propensity
+    data[6] = meta.pros_prop
+
     
-    localstddev = [[pow(np.var([size[x][y] for size in meta.localsizes[-5:]]), 0.5) for y in range(dim)] for x in range(dim)]
-    localmean = [[np.mean([size[x][y] for size in meta.localsizes[-5:]]) for y in range(dim)] for x in range(dim)]
+    #temporal standard deviation of local population sizes during the last 5 generations at each location
+    localstddev = [[pow(np.var([size[x,y] for size in meta.localsizes[-5:]]), 0.5) for y in range(dim)] for x in range(dim)]
+    #temporal mean local population sizes during the last 5 generations at each location
+    localmean = [[np.mean([size[x,y] for size in meta.localsizes[-5:]]) for y in range(dim)] for x in range(dim)]
+    #temporal variance of total metapopulation size during the last 5 generations
     globalvar = np.var([np.sum(size) for size in meta.localsizes[-5:]])
+    #temporal mean of total metapopulation size during the last 5 generations
     globalmean = np.mean([np.sum(size) for size in meta.localsizes[-5:]])
-    data[5] = pow(np.sum(localstddev)/np.sum(localmean), 2)
-    data[6] = globalvar/pow(globalmean, 2)
-    data[7] = pow(np.sum(localstddev), 2)/globalvar
     
-    if not os.path.exists(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialvarT)):
-        os.makedirs(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialvarT))
-    np.save(default_path + '/data/varT/'+ str(directed) + '/'+ str(cost) + '/'+ str(initialvarT) + '/rep'+ str(rep), data)
-       
-
-
-def run(MAXTIME, dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_dispersal, mutable_variability, directed, cost):
+    #local population variability (alpha variability)
+    data[7] = pow(np.sum(localstddev)/np.sum(localmean), 2)
+    #metapopulation variability (gamma variability)
+    data[8] = globalvar/pow(globalmean, 2)
+    #metapopulation synchrony (beta variability)
+    data[9] = pow(np.sum(localstddev), 2)/globalvar
+    
+    #save metrics
+    if not os.path.exists('{}/data/{}/departure{}/settlement{}/{}/{}'.format(default_path, mode, str(departure), str(settlement), str(cost), str(trait))):
+        os.makedirs('{}/data/{}/departure{}/settlement{}/{}/{}'.format(default_path, mode, str(departure), str(settlement), str(cost), str(trait)))
+    np.save('{}/data/{}/departure{}/settlement{}/{}/{}/rep{}'.format(default_path, mode, str(departure), str(settlement), str(cost), str(trait), str(rep)), data)
+    #save final local population sizes
+    localsizes = [meta.localsizes[-1][x][y] for x in range(dim) for y in range(dim)]
+    np.save('{}/data/{}/departure{}/settlement{}/{}/{}/locrep{}'.format(default_path, mode, str(departure), str(settlement), str(cost), str(trait), str(rep)), localsizes)
+    
+    
+def run(MAXTIME, dim,R_res,K_res, maxd, initialvarT, initialthreshold, mutable_dispersal, mutable_variability, departure, directed, cost):
     '''
     helper function that initiates a metapopulation and let it evolve for a given amount of generations
-    dispersal and niche width are either evolvable or not, with initial values passed (important for fixed traits), dispersal is directed or not
+    dispersal and niche width are either fixed or evolvable, with initial values passed for fixed traits
+    all other parameters are passed to the metapopulation object
     '''
+    #initialize metapopulation
+    meta = Metapopulation(dim,dim,R_res,K_res, maxd, initialvarT, initialthreshold, mutable_dispersal, mutable_variability, departure, directed, cost)
     
-    meta = Metapopulation(dim,dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_dispersal, mutable_variability, directed, cost)
-    
+    #initialize landscape
     meta.loadlandscape()
     
-    for timer in range(MAXTIME):
-        print('generation ',timer)
-    
+    #simulate MAXTIME generations (print generation time and metapopulation size for quickly checking during runs)
+    for timer in range(MAXTIME): 
         meta.lifecycle()
-        print ("popsize: {}\n".format(len(meta.population)))
+    print('generation ',timer)
+    print("popsize: {}\n".format(len(meta.population)))
     return(meta)
-    
-    
-def LH_both(directed, rep, cost = 0):
-    '''
-    evolved values of metapopulation and life history parameters regressed for varT
-    '''    
-    mutable_threshold, mutable_variability = 1, 1
-    data = np.zeros(9)
-    meta = run(MAXTIME, dim,R_res,K_res, initialmaxd, initialvarT, initialthreshold, mutable_threshold, mutable_variability,directed, cost)
-    diversity = [ind.muT for ind in meta.population]
-    thresholds = [ind.threshold for ind in meta.population]
-    nichebr = [ind.varT for ind in meta.population]
-    habitatmatch = [ind.muT-meta.environment[ind.y][ind.x] for ind in meta.population]
-    data[0] = sum(diversity)/len(diversity)
-    data[1] = sum(thresholds)/len(thresholds)
-    data[2] = sum(nichebr)/len(nichebr)
-    data[3] = abs(sum(habitatmatch)/len(habitatmatch))
-    data[4] = len(meta.population)
-    data[5] = meta.disp_prop
-    
-    localstddev = [[pow(np.var([size[x][y] for size in meta.localsizes[-5:]]), 0.5) for y in range(dim)] for x in range(dim)]
-    localmean = [[np.mean([size[x][y] for size in meta.localsizes[-5:]]) for y in range(dim)] for x in range(dim)]
-    globalvar = np.var([np.sum(size) for size in meta.localsizes[-5:]])
-    globalmean = np.mean([np.sum(size) for size in meta.localsizes[-5:]])
-    data[6] = pow(np.sum(localstddev)/np.sum(localmean), 2)
-    data[7] = globalvar/pow(globalmean, 2)
-    data[8] = pow(np.sum(localstddev), 2)/globalvar
-        
-    if not os.path.exists(default_path + '/data/both/' + str(directed) + '/'+ str(cost)):
-        os.makedirs(default_path + '/data/both/' + str(directed) + '/'+ str(cost))
-    np.save(default_path + '/data/both/' + str(directed) + '/'+ str(cost)+ '/' + str(rep), data)
-        
-    
+
+
     
 '''
-Default PARAMETERS
+PARAMETERS
 '''
 
-MAXTIME=50  #50
-dim = 32
-R_res = 0.25
-K_res = 1  
-initialmaxd = 2
-initialvarT = 0.05
-initialthreshold = 0.1
-directed = 1   
-cost = float(sys.argv[1]) #cost of directed dispersal
-disp = float(sys.argv[2])
-rep  = sys.argv[3]
 
-#LHcostplots(start, end, step, atype, directed, costs)
-LH_varT(disp, rep,cost)
-#LHcombinedplot(np.arange(start, end+step, step), 'dispersal', step/2)
+MAXTIME=500                     #generation time, default:50
+dim = 32                        #grid size (dim X dim gridcells), default:32
+R_res = 0.25                    #optimal growth resources, default:0.25
+K_res = 1                       #carrying capacity resources, default:1
+maxd = 2                        #maximum dispersal length, default:2
+func = LH_dispersal            #fixed trait
+#departure =int(sys.argv[4])     #departure decision, int(sys.argv[5])
+#settlement =int(sys.argv[3])    #settlement desicion, int(sys.argv[4]) 
+cost = float(sys.argv[1])       #cost of directed dispersal, float(sys.argv[1])  
+rep  = int(sys.argv[3])                  #replicate, sys.argv[3]
+
+for departure in [0, 1]:
+    for settlement in [0, 1]:
+        trait = (1 if func == LH_varT else 5 if departure else 1)*float(sys.argv[2]) 
+        func(trait)
+print(str(time.clock()))
