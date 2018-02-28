@@ -436,6 +436,6 @@ end = 1
 step = 0.05
 
 
-LH_both(iters, cost)
+LH_varT(iters, start, end, step, cost)
 #LHplot(np.arange(start, end+step, step), 'dispersal', directed, step/2)
 #LHcombinedplot(np.arange(start, end+step, step), 'dispersal', step/2)
