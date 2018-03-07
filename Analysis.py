@@ -53,13 +53,13 @@ def runall(initialthreshold, initialvarT, mutable_threshold, mutable_variability
 
     
     #temporal standard deviation of local population sizes during the last 5 generations at each location
-    localstddev = [[pow(np.var([size[x,y] for size in meta.localsizes[-5:]]), 0.5) for y in range(dim)] for x in range(dim)]
+    localstddev = [[pow(np.var([size[x,y] for size in meta.localsizes[:]]), 0.5) for y in range(dim)] for x in range(dim)]
     #temporal mean local population sizes during the last 5 generations at each location
-    localmean = [[np.mean([size[x,y] for size in meta.localsizes[-5:]]) for y in range(dim)] for x in range(dim)]
+    localmean = [[np.mean([size[x,y] for size in meta.localsizes[:]]) for y in range(dim)] for x in range(dim)]
     #temporal variance of total metapopulation size during the last 5 generations
-    globalvar = np.var([np.sum(size) for size in meta.localsizes[-5:]])
+    globalvar = np.var([np.sum(size) for size in meta.localsizes[:]])
     #temporal mean of total metapopulation size during the last 5 generations
-    globalmean = np.mean([np.sum(size) for size in meta.localsizes[-5:]])
+    globalmean = np.mean([np.sum(size) for size in meta.localsizes[:]])
     
     #local population variability (alpha variability)
     data[7] = pow(np.sum(localstddev)/np.sum(localmean), 2)
