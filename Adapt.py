@@ -46,7 +46,7 @@ class Individual:
         rnd.shuffle(g)
         rnd.shuffle(h)
         
-        if self.settlement:
+        if self.settlement and rnd.random()<0.5:     #the random term adds a possibility for imperfect choice
             #with settlement decision
             diff = 1
             #loop through every combination of xs and ys   
@@ -180,7 +180,7 @@ class Metapopulation:
             #calculate how much resources the individual needs to reproduce
             necessary_resources=ind.resource_use(self.environment[ind.x,ind.y],self.resources[ind.x, ind.y])
             #decide to move: according to available resources when there is a departure decision, random when there is not
-            if (ind.sigma*necessary_resources if self.departure else rnd.random()) < ind.d:
+            if (ind.sigma*necessary_resources if (self.departure and rnd.random()<0.5) else rnd.random()) < ind.d: #the random term with the departure choice allows for imperfect habitat choice
                 x_, y_ = ind.x, ind.y 
                 ind.move(self.max_x, self.max_y, self.environment)
                 prospectnumber += 1
